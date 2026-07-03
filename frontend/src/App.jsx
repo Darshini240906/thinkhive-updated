@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/Layout/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
+import ActivateAccountPage from "./pages/ActivateAccountPage";
 import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
 import DocumentsPage from "./pages/DocumentsPage";
@@ -26,6 +27,7 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/activate" element={<ActivateAccountPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

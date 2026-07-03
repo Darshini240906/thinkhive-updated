@@ -2,6 +2,11 @@ from datetime import UTC, datetime, timedelta
 import bcrypt
 from jose import jwt
 from config import settings
+import secrets
+
+
+def generate_setup_code() -> str:
+    return f"{secrets.randbelow(1000000):06d}"
 
 
 def hash_password(password: str) -> str:
