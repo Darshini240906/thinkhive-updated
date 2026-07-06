@@ -3,18 +3,19 @@ from api.dependencies.check_permissions import require_permission
 from core.context import TenantContext
 
 router = APIRouter(prefix="/voice", tags=["voice"])
-
-
 @router.post("/query")
 async def voice_query(
     audio: UploadFile = File(...),
     context: TenantContext = Depends(require_permission("query:run")),
 ) -> dict:
     content = await audio.read()
+    print(f"[VOICE DEBUG] Received {len(content)} bytes, filename={audio.filename}")
     transcript, error = await _transcribe(content, audio.filename or "audio.webm")
+    print(f"[VOICE DEBUG] Transcript result: '{transcript}', error: {error}")
     if error:
         return {"transcribed_text": "", "status": "error", "error": error, "filename": audio.filename}
     return {"transcribed_text": transcript, "status": "transcribed", "filename": audio.filename}
+
 
 
 async def _transcribe(content: bytes, filename: str) -> tuple[str, str | None]:

@@ -31,7 +31,7 @@ async def summarize(
 
 '''
 
-
+'''
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from api.dependencies.check_permissions import require_permission
@@ -53,4 +53,32 @@ async def voice_query(
         "bytes_received": len(content),
         "transcript": "",
         "status": "received",
+    }
+'''
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+
+from api.dependencies.check_permissions import require_permission
+from core.context import TenantContext
+
+router = APIRouter(prefix="/summary", tags=["summary"])
+
+
+class SummaryRequest(BaseModel):
+    topic: str
+
+
+@router.post("")
+async def generate_summary(
+    request: SummaryRequest,
+    context: TenantContext = Depends(require_permission("query:run")),
+) -> dict:
+    # TODO: implement real summarization — retrieve relevant chunks for
+    # request.topic from Qdrant (scoped to context.org_id / domain_id),
+    # then call Groq LLM to generate an actual summary with citations.
+    return {
+        "topic": request.topic,
+        "summary": f"Summary generation is not yet implemented for '{request.topic}'.",
+        "status": "not_implemented",
     }

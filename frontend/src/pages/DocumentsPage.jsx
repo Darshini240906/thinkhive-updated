@@ -1,4 +1,4 @@
-import UploadPanel from "../components/Upload/UploadPanel";
+/*import UploadPanel from "../components/Upload/UploadPanel";
 import DocumentList from "../components/Upload/DocumentList";
 export default function DocumentsPage() {
   return (
@@ -6,6 +6,29 @@ export default function DocumentsPage() {
       <div><h1 className="text-2xl font-bold text-white">Documents</h1><p className="mt-1 text-white/50">Upload and manage your knowledge base documents</p></div>
       <div className="rounded-2xl border border-white/10 bg-[#131929] p-6"><h2 className="text-base font-semibold text-white mb-4">Upload Documents</h2><UploadPanel /></div>
       <div className="rounded-2xl border border-white/10 bg-[#131929] p-6"><h2 className="text-base font-semibold text-white mb-4">Knowledge Base</h2><DocumentList /></div>
+    </div>
+  );
+}
+*/
+
+import UploadPanel from "../components/Upload/UploadPanel";
+import DocumentList from "../components/Upload/DocumentList";
+
+export default function DocumentsPage() {
+  return (
+    <div className="max-w-6xl mx-auto space-y-8">
+      <div>
+        <h1 className="font-display text-3xl font-bold text-cream">Documents</h1>
+        <p className="mt-1 text-rose-muted">Upload and manage your knowledge base documents</p>
+      </div>
+      <div className="rounded-2xl border border-border bg-surface p-6">
+        <h2 className="font-display text-lg font-semibold text-cream mb-4">Upload Documents</h2>
+        <UploadPanel />
+      </div>
+      <div className="rounded-2xl border border-border bg-surface p-6">
+        <h2 className="font-display text-lg font-semibold text-cream mb-4">Knowledge Base</h2>
+        <DocumentList />
+      </div>
     </div>
   );
 }
