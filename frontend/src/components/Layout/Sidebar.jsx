@@ -63,6 +63,7 @@ const NAV = [
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -101,7 +102,7 @@ export default function Sidebar() {
 
       <div className="border-t border-border p-3">
         <button
-          onClick={() => {}}
+          onClick={() => navigate("/settings")}
           className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-rose-muted hover:bg-white/5 hover:text-cream transition-colors"
         >
           <Settings size={19} className="flex-shrink-0" />

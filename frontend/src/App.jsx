@@ -4,6 +4,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import AppLayout from "./components/Layout/AppLayout";
 import ProtectedRoute from "./components/Layout/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
+import AboutPage from "./pages/AboutPage";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import ActivateAccountPage from "./pages/ActivateAccountPage";
@@ -15,7 +16,7 @@ import AdminPage from "./pages/AdminPage";
 import DomainsPage from "./pages/DomainsPage";
 import HRPage from "./pages/HRPage";
 import KnowledgeMapPage from "./pages/KnowledgeMapPage";
-
+import SettingsPage from "./pages/SettingsPage";
 export default function App() {
   const { fetchUser, token } = useAuthStore();
 
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/activate" element={<ActivateAccountPage />} />
@@ -40,6 +42,7 @@ export default function App() {
           <Route path="/hr" element={<HRPage />} />
           <Route path="/knowledge-map" element={<KnowledgeMapPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 

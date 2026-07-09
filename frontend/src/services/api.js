@@ -47,6 +47,8 @@ export const getKnowledgeMapDocuments = async () => {
   return response.data;
 };
 export const getPermissionsMatrix = () => api.get("/admin/permissions-matrix").then(r => r.data);
+export const changePassword = (current_password, new_password) =>
+api.post("/auth/change-password", { current_password, new_password }).then(r => r.data);
 export const activateAccount = d => api.post("/auth/activate", d).then(r => r.data);
 export const resendActivation = d => api.post("/auth/resend-activation", d).then(r => r.data);
 export default api;

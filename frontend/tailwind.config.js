@@ -26,6 +26,7 @@ export default {
         success: withOpacity('--color-success'),
         danger: withOpacity('--color-danger'),
         warn: withOpacity('--color-warn'),
+        sage: withOpacity('--color-sage'),
 
         // Additive only — your friend's extra names, backed by new variables
         // that default to match your existing palette. Nothing currently in
