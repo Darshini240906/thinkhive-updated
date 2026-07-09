@@ -33,6 +33,7 @@ export const getDomainTypes = () => api.get("/domains/types").then(r => r.data);
 export const getDomains = () => api.get("/domains").then(r => r.data);
 export const createDomain = d => api.post("/domains", d).then(r => r.data);
 export const deleteDomain = id => api.delete(`/domains/${id}`).then(r => r.data);
+export const getDomainMembers = id => api.get(`/domains/${id}/members`).then(r => r.data);
 export const getMembers = () => api.get("/hr/members").then(r => r.data);
 export const addMember = d => api.post("/hr/members", d).then(r => r.data);
 export const bulkUploadCSV = file => { const f = new FormData(); f.append("file", file); return api.post("/hr/bulk-upload", f).then(r => r.data); };
@@ -45,8 +46,7 @@ export const getKnowledgeMapDocuments = async () => {
   const response = await api.get('/knowledge-map/documents');
   return response.data;
 };
-
+export const getPermissionsMatrix = () => api.get("/admin/permissions-matrix").then(r => r.data);
 export const activateAccount = d => api.post("/auth/activate", d).then(r => r.data);
 export const resendActivation = d => api.post("/auth/resend-activation", d).then(r => r.data);
 export default api;
-

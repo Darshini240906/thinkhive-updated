@@ -1,8 +1,11 @@
-//export default {
-//content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
-//theme: { extend: { colors: { primary: "#4F8EF7", accent: "#2DD4A7", dark: "#0B0F1A", surface: "#131929", border: "#1C2540" } } },
-//plugins: [],
-//};
+function withOpacity(variableName) {
+  return ({ opacityValue }) => {
+    if (opacityValue !== undefined && !Number.isNaN(Number(opacityValue))) {
+      return `color-mix(in srgb, var(${variableName}) ${Number(opacityValue) * 100}%, transparent)`;
+    }
+    return `var(${variableName})`;
+  };
+}
 
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
@@ -10,19 +13,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: "var(--color-base)",
-        "base-deep": "var(--color-base-deep)",
-        surface: "var(--color-surface)",
-        "surface-hover": "var(--color-surface-hover)",
-        border: "var(--color-border)",
-        cream: "var(--color-cream)",
-        "rose-muted": "var(--color-rose-muted)",
-        gold: "#D4AF6A",
-        "gold-dark": "#C9A15A",
-        "gold-light": "#E4C88A",
-        success: "#4ADE80",
-        danger: "#E05252",
-        warn: "#E0A952",
+        base: withOpacity('--color-base'),
+        "base-deep": withOpacity('--color-base-deep'),
+        surface: withOpacity('--color-surface'),
+        "surface-hover": withOpacity('--color-surface-hover'),
+        border: withOpacity('--color-border'),
+        cream: withOpacity('--color-cream'),
+        "rose-muted": withOpacity('--color-rose-muted'),
+        gold: withOpacity('--color-gold'),
+        "gold-dark": withOpacity('--color-gold-dark'),
+        "gold-light": withOpacity('--color-gold-light'),
+        success: withOpacity('--color-success'),
+        danger: withOpacity('--color-danger'),
+        warn: withOpacity('--color-warn'),
+
+        // Additive only — your friend's extra names, backed by new variables
+        // that default to match your existing palette. Nothing currently in
+        // the app uses these, so nothing breaks; they're just available now.
+        primary: { DEFAULT: withOpacity('--color-primary'), foreground: withOpacity('--color-primary-foreground') },
+        secondary: { DEFAULT: withOpacity('--color-secondary'), foreground: withOpacity('--color-secondary-foreground') },
+        muted: { DEFAULT: withOpacity('--color-muted'), foreground: withOpacity('--color-muted-foreground') },
+        accent: { DEFAULT: withOpacity('--color-accent'), foreground: withOpacity('--color-accent-foreground') },
+        destructive: { DEFAULT: withOpacity('--color-destructive'), foreground: withOpacity('--color-destructive-foreground') },
+        sidebar: {
+          DEFAULT: withOpacity('--color-sidebar'),
+          foreground: withOpacity('--color-sidebar-foreground'),
+          border: withOpacity('--color-sidebar-border'),
+          active: withOpacity('--color-sidebar-active'),
+          "active-foreground": withOpacity('--color-sidebar-active-foreground'),
+        },
       },
       fontFamily: {
         display: ["'Playfair Display'", "serif"],
