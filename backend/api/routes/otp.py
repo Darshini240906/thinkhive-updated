@@ -40,7 +40,13 @@ class VerifyReq(BaseModel):
 @router.post("/send")
 async def send(req: SendReq) -> dict:
     otp = generate_otp(req.email)
-    await send_registration_otp_email(req.email, otp)
+    try:
+        await send_registration_otp_email(req.email, otp)
+    except Exception as e:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            f"Failed to send OTP email: {e}",
+        )
     return {"message": "OTP sent to your email", "expires_in_minutes": 10}
 
 @router.post("/verify")

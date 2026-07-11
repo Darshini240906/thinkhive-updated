@@ -8,8 +8,9 @@ from config import settings
 
 def _send_sync(to_email: str, subject: str, html_body: str) -> None:
     if not settings.smtp_user or not settings.smtp_password:
-        print(f"[EMAIL DISABLED - no SMTP configured] Would send to {to_email}: {subject}")
-        return
+        raise RuntimeError(
+            "SMTP not configured: missing SMTP_USER or SMTP_PASSWORD in backend/.env"
+        )
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"{settings.smtp_from_name} <{settings.smtp_from_email or settings.smtp_user}>"
@@ -20,6 +21,10 @@ def _send_sync(to_email: str, subject: str, html_body: str) -> None:
         server.starttls()
         server.login(settings.smtp_user, settings.smtp_password.get_secret_value())
         server.sendmail(msg["From"], [to_email], msg.as_string())
+
+
+async def send_email(to_email: str, subject: str, html_body: str) -> None:
+    await asyncio.to_thread(_send_sync, to_email, subject, html_body)
 
 
 async def send_email(to_email: str, subject: str, html_body: str) -> None:

@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, Trash2, Bot } from "lucide-react";
+import { Send, Trash2, Bot, Globe } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import VoiceRecorder from "./VoiceRecorder";
 import { useChatStore } from "../../store/useChatStore";
+import { useLanguageStore, LANGUAGES } from "../../store/useLanguageStore";
 
 const SUGGESTIONS = ["What is the leave policy?", "Summarise vendor contracts", "What are safety protocols?", "Who are our key suppliers?"];
 
 export default function ChatWindow() {
-  const { messages, isLoading, send, clear } = useChatStore();
+  const { messages, isLoading, send, newChat } = useChatStore();
+  const { language, setLanguage } = useLanguageStore();
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isLoading]);
 
   async function handleSend() { const q = input.trim(); if (!q || isLoading) return; setInput(""); await send(q); }
@@ -27,11 +30,23 @@ export default function ChatWindow() {
             <p className="text-xs text-rose-muted">RAG-powered · cited answers</p>
           </div>
         </div>
-        {messages.length > 0 && (
-          <button onClick={clear} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-rose-muted hover:bg-white/5 hover:text-cream transition-colors">
-            <Trash2 size={13} /> Clear
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1.5">
+            <Globe size={13} className="text-rose-muted" />
+            <select
+              value={language}
+              onChange={e => setLanguage(e.target.value)}
+              className="bg-transparent text-xs text-cream focus:outline-none cursor-pointer"
+            >
+              {LANGUAGES.map(l => <option key={l.code} value={l.code} className="bg-surface text-cream">{l.label}</option>)}
+            </select>
+          </div>
+          {messages.length > 0 && (
+            <button onClick={newChat} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-rose-muted hover:bg-white/5 hover:text-cream transition-colors">
+              <Trash2 size={13} /> Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
@@ -90,13 +105,12 @@ export default function ChatWindow() {
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gold hover:bg-gold-light disabled:opacity-40 transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-gold text-base-deep hover:bg-gold-light disabled:opacity-40 transition-colors"
             >
-              <Send size={15} className="text-base-deep" />
+              <Send size={16} />
             </button>
           </div>
         </div>
-        <p className="mt-1.5 text-center text-xs text-rose-muted/50">Enter to send · Shift+Enter for newline · 🎙 for voice</p>
       </div>
     </div>
   );

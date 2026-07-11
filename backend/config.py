@@ -4,8 +4,7 @@ from pydantic import SecretStr, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent          # .../ThinkHive/backend
-ENV_PATH = BASE_DIR.parent / ".env"                  # .../ThinkHive/.env
-
+ENV_PATH = BASE_DIR / ".env"                         # .../ThinkHive/backend/.env
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(

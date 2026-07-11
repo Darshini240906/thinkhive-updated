@@ -1,16 +1,20 @@
-from fastapi import APIRouter, Depends, File, UploadFile
+# backend/api/routes/voice.py
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from api.dependencies.check_permissions import require_permission
 from core.context import TenantContext
+from core.languages import get_language
 
 router = APIRouter(prefix="/voice", tags=["voice"])
+
 @router.post("/query")
 async def voice_query(
     audio: UploadFile = File(...),
+    language: str = Form(default="en"),
     context: TenantContext = Depends(require_permission("query:run")),
 ) -> dict:
     content = await audio.read()
-    print(f"[VOICE DEBUG] Received {len(content)} bytes, filename={audio.filename}")
-    transcript, error = await _transcribe(content, audio.filename or "audio.webm")
+    print(f"[VOICE DEBUG] Received {len(content)} bytes, filename={audio.filename}, language={language}")
+    transcript, error = await _transcribe(content, audio.filename or "audio.webm", language)
     print(f"[VOICE DEBUG] Transcript result: '{transcript}', error: {error}")
     if error:
         return {"transcribed_text": "", "status": "error", "error": error, "filename": audio.filename}
@@ -18,13 +22,15 @@ async def voice_query(
 
 
 
-async def _transcribe(content: bytes, filename: str) -> tuple[str, str | None]:
+async def _transcribe(content: bytes, filename: str, language: str = "en") -> tuple[str, str | None]:
     import tempfile, os, asyncio
     from config import settings
 
     groq_key = settings.groq_api_key.get_secret_value() if settings.groq_api_key else None
     if not groq_key:
         return "", "GROQ_API_KEY not configured in .env"
+
+    whisper_lang = get_language(language).whisper_code
 
     ext = "." + filename.rsplit(".", 1)[-1] if "." in filename else ".webm"
     tmp_path = None
@@ -42,6 +48,7 @@ async def _transcribe(content: bytes, filename: str) -> tuple[str, str | None]:
                     file=(filename, f.read()),
                     model="whisper-large-v3-turbo",
                     response_format="text",
+                    language=whisper_lang,
                 )
 
         result = await asyncio.get_event_loop().run_in_executor(None, _call)

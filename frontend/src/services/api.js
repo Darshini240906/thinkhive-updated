@@ -21,12 +21,17 @@ export const getDocumentStatus = id => api.get(`/documents/${id}/status`).then(r
 export const deleteDocument = id => api.delete(`/documents/${id}`).then(r => r.data);
 export const getSanitisationReport = id => api.get(`/document-tags/${id}/sanitisation-report`).then(r => r.data);
 export const updateDocumentTags = (id, d) => api.put(`/document-tags/${id}`, d).then(r => r.data);
-export const sendQuery = (query, limit = 8) => api.post("/query", { query, limit }).then(r => r.data);
-export const sendVoiceQuery = blob => { const f = new FormData(); f.append("audio", blob, "recording.webm"); return api.post("/voice/query", f).then(r => r.data); };
+export const sendQuery = (query, language = "en", conversationId = null, limit = 8) =>
+  api.post("/query", { query, language, conversation_id: conversationId, limit }).then(r => r.data);
+export const sendVoiceQuery = (blob, language = "en") => { const f = new FormData(); f.append("audio", blob, "recording.webm"); f.append("language", language); return api.post("/voice/query", f).then(r => r.data); };
+export const getConversations = () => api.get("/chat/conversations").then(r => r.data);
+export const getConversationMessages = id => api.get(`/chat/conversations/${id}/messages`).then(r => r.data);
+export const deleteConversation = id => api.delete(`/chat/conversations/${id}`).then(r => r.data);
 export const semanticSearch = (query, limit = 10) => api.post("/search", { query, limit }).then(r => r.data);
 export const generateSummary = topic => api.post("/summary", { topic }).then(r => r.data);
 export const getDashboardMetrics = () => api.get("/dashboard/metrics").then(r => r.data);
 export const getKnowledgeMap = () => api.get("/dashboard/knowledge-map").then(r => r.data);
+export const getGapAnalysis = () => api.get("/dashboard/gap-analysis").then(r => r.data);
 export const getKnowledgeGaps = () => api.get("/dashboard/gaps").then(r => r.data);
 export const getPredictiveInsights = () => api.get("/dashboard/insights").then(r => r.data);
 export const getDomainTypes = () => api.get("/domains/types").then(r => r.data);
