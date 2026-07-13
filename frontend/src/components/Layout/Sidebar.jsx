@@ -9,6 +9,7 @@ const NAV = [
   { to: "/chat", icon: MessageSquare, label: "AI Assistant", permission: "query:run" },
   { to: "/documents", icon: FileText, label: "Documents", permission: "documents:read" },
   { to: "/search", icon: Search, label: "Search", permission: "query:run" },
+  { to: "/reports", icon: Sparkles, label: "Reports", permission: "query:run" },
   { to: "/domains", icon: FolderOpen, label: "Domains", permission: "documents:read" },
   { to: "/hr", icon: Users, label: "HR", permission: "hr:manage" },
   { to: "/knowledge-map", icon: BrainCircuit, label: "Knowledge Map", permission: "documents:read" },

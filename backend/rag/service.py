@@ -63,6 +63,27 @@ class LLMService:
         if self._gemini:
             return await self._gemini_gen(system_prompt, user_msg)
         return f"*LLM not configured. Add GROQ_API_KEY or GOOGLE_API_KEY to .env*\n\nRelevant content found:\n\n{context[:600]}"
+        async def generate_report(self, instruction: str, chunks: list[RetrievedChunk], language_code: str = "en") -> str:
+        """Generate a structured, source-bound report from retrieved passages."""
+        lang = get_language(language_code)
+        context = "\n\n---\n\n".join(
+            f"[{c.metadata.get('document_name', 'Document')}, Page {c.metadata.get('page_number', 1)}]:\n{c.text}"
+            for c in chunks[:12]
+        )
+        system_prompt = (
+            "You are ThinkHive's enterprise reporting assistant. "
+            "Use only the supplied source passages. Never make up facts, owners, dates, conclusions, or citations. "
+            f"Write only in {lang.llm_name}."
+        )
+        user_msg = f"Sources:\n{context}\n\nTask: {instruction}"
+        if self._groq:
+            return await self._groq_gen(system_prompt, user_msg)
+        if self._gemini:
+            return await self._gemini_gen(system_prompt, user_msg)
+        return "## Source material\n\n" + "\n\n".join(
+            f"- {c.text[:500]} [{c.metadata.get('document_name', 'Document')}, Page {c.metadata.get('page_number', 1)}]"
+            for c in chunks[:5]
+        )
 
     async def _groq_gen(self, system_prompt: str, msg: str) -> str:
         import asyncio

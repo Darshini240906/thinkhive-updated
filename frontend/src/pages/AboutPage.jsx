@@ -62,7 +62,7 @@ export default function AboutPage() {
           </h1>
           <p className="mt-6 text-lg text-rose-muted">
             {/* Placeholder — replace with real company description */}
-            A short paragraph about ThinkHive's mission and why it exists goes here. Replace this placeholder with your actual company story.
+            Stop searching. Start asking.  ThinkHive-your organization's brain, on demand.
           </p>
         </div>
       </section>

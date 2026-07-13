@@ -19,6 +19,7 @@ import HRPage from "./pages/HRPage";
 import KnowledgeMapPage from "./pages/KnowledgeMapPage";
 import SettingsPage from "./pages/SettingsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import ReportsPage from "./pages/ReportsPage";
 export default function App() {
   const { fetchUser, token } = useAuthStore();
 
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/domains" element={<DomainsPage />} />
           <Route path="/hr" element={<HRPage />} />
           <Route path="/knowledge-map" element={<KnowledgeMapPage />} />

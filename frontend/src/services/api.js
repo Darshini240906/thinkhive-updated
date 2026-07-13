@@ -57,6 +57,7 @@ api.post("/auth/change-password", { current_password, new_password }).then(r => 
 
 export const activateAccount = d => api.post("/auth/activate", d).then(r => r.data);
 export const resendActivation = d => api.post("/auth/resend-activation", d).then(r => r.data);
+export const generateReport = data => api.post("/reports", data).then(r => r.data);
 
 // Knowledge Analytics Dashboard — super admin only (backend enforces via
 // the "analytics:read" permission, which no other role is ever granted).
