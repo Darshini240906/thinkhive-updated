@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Brain, LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield } from "lucide-react";
+import { Brain, LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield, BarChart3 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { hasPermission } from "../../utils/permissions";
 
@@ -17,11 +17,14 @@ const NAV = [
 const SUPER_ADMIN_NAV = [
   { to: "/analytics", icon: BarChart3, label: "Analytics" },
 ];
+
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
-  const visibleNav = NAV.filter(item => hasPermission(user, item.permission));
+  const visibleNav = user?.role === "org_super_admin"
+    ? [...NAV.filter(item => hasPermission(user, item.permission)), ...SUPER_ADMIN_NAV]
+    : NAV.filter(item => hasPermission(user, item.permission));
 
   return (
     <aside
