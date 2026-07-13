@@ -14,7 +14,9 @@ const NAV = [
   { to: "/knowledge-map", icon: BrainCircuit, label: "Knowledge Map", permission: "documents:read" },
   { to: "/admin", icon: Shield, label: "Admin", permission: "admin:read" },
 ];
-
+const SUPER_ADMIN_NAV = [
+  { to: "/analytics", icon: BarChart3, label: "Analytics" },
+];
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
