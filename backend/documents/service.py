@@ -7,14 +7,18 @@ from core.chunking import chunk_text
 from core.context import TenantContext
 from core.embeddings import EmbeddingService
 from core.enums import AgeTag, DocumentClassification, DocumentStatus, FreshnessTag, Role, UsageTag
+from core.extraction.audio_extractor import extract_audio
 from core.extraction.docx_extractor import extract_docx
 from core.extraction.ocr_extractor import extract_ocr
-from core.extraction.pdf_extractor import extract_pdf
+from core.extraction.pdf_extractor import ExtractionResult, extract_pdf
 from core.extraction.txt_extractor import extract_txt
+from core.extraction.youtube_extractor import extract_youtube
 from core.retrieval import QdrantRetrievalService
 from core.sanitisation.service import SanitisationService
 from documents.models import DocumentRead, UploadResponse
 from documents.repository import DocumentRepository
+
+AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".webm", ".ogg", ".flac", ".mp4", ".mpeg", ".mpga"}
 
 
 class DocumentService:
@@ -24,7 +28,8 @@ class DocumentService:
         self.retrieval = QdrantRetrievalService()
         self.sanitiser = SanitisationService()
 
-    async def upload(self, context: TenantContext, file: UploadFile, classification: DocumentClassification) -> UploadResponse:
+    async def upload(self, context: TenantContext, file: UploadFile, classification: DocumentClassification,
+                      language: str = "en") -> UploadResponse:
         ext = Path(file.filename or "").suffix.lower()
         if ext not in settings.allowed_upload_extensions:
             raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"File type {ext} not supported")
@@ -41,9 +46,37 @@ class DocumentService:
             result = await extract_docx(content)
         elif ext in (".png", ".jpg", ".jpeg"):
             result = await extract_ocr(content, is_pdf=False)
+        elif ext in AUDIO_EXTENSIONS:
+            result = await extract_audio(content, file.filename or "audio", language)
         else:
             result = await extract_txt(content)
 
+        if not result.text.strip():
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                result.metadata.get("error") or "Could not extract any text from this file",
+            )
+
+        return await self._finalize(
+            context, file.filename or "untitled",
+            file.content_type or "application/octet-stream",
+            classification, result,
+        )
+
+    async def upload_youtube(self, context: TenantContext, url: str, classification: DocumentClassification,
+                              language: str = "en") -> UploadResponse:
+        result = await extract_youtube(url, language)
+        if not result.text.strip():
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                result.metadata.get("error") or "Could not extract a transcript from that video",
+            )
+
+        title = result.metadata.get("title") or url
+        return await self._finalize(context, f"{title} (YouTube)", "video/youtube", classification, result)
+
+    async def _finalize(self, context: TenantContext, filename: str, content_type: str,
+                         classification: DocumentClassification, result: ExtractionResult) -> UploadResponse:
         sanitised_text, sanitisation_log = self.sanitiser.sanitise(result.text)
 
         # Internal docs inherit the uploader's domain. Public/Confidential don't need one.
@@ -51,8 +84,8 @@ class DocumentService:
 
         doc_id = await self.repo.create_document(context.org_id, {
             "uploaded_by": context.user_id,
-            "filename": file.filename,
-            "content_type": file.content_type or "application/octet-stream",
+            "filename": filename,
+            "content_type": content_type,
             "classification": classification.value,
             "domain_id": domain_id,
             "status": DocumentStatus.PROCESSING.value,
@@ -66,7 +99,7 @@ class DocumentService:
             "query_count": 0,
         })
 
-        await self._index(sanitised_text, doc_id, file.filename or "", context.org_id, classification.value, domain_id, context.user_id)
+        await self._index(sanitised_text, doc_id, filename, context.org_id, classification.value, domain_id, context.user_id)
 
         await self.repo.update_by_id(context.org_id, doc_id, {"status": DocumentStatus.READY.value})
 

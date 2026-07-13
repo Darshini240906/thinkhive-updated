@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from api.dependencies.check_permissions import require_permission
 from core.context import TenantContext
-from core.languages import get_language
+from core.transcription import transcribe_audio
 
 router = APIRouter(prefix="/voice", tags=["voice"])
 
@@ -13,50 +13,7 @@ async def voice_query(
     context: TenantContext = Depends(require_permission("query:run")),
 ) -> dict:
     content = await audio.read()
-    print(f"[VOICE DEBUG] Received {len(content)} bytes, filename={audio.filename}, language={language}")
-    transcript, error = await _transcribe(content, audio.filename or "audio.webm", language)
-    print(f"[VOICE DEBUG] Transcript result: '{transcript}', error: {error}")
+    transcript, error = await transcribe_audio(content, audio.filename or "audio.webm", language)
     if error:
         return {"transcribed_text": "", "status": "error", "error": error, "filename": audio.filename}
     return {"transcribed_text": transcript, "status": "transcribed", "filename": audio.filename}
-
-
-
-async def _transcribe(content: bytes, filename: str, language: str = "en") -> tuple[str, str | None]:
-    import tempfile, os, asyncio
-    from config import settings
-
-    groq_key = settings.groq_api_key.get_secret_value() if settings.groq_api_key else None
-    if not groq_key:
-        return "", "GROQ_API_KEY not configured in .env"
-
-    whisper_lang = get_language(language).whisper_code
-
-    ext = "." + filename.rsplit(".", 1)[-1] if "." in filename else ".webm"
-    tmp_path = None
-    try:
-        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
-            tmp.write(content)
-            tmp_path = tmp.name
-
-        from groq import Groq
-        client = Groq(api_key=groq_key)
-
-        def _call():
-            with open(tmp_path, "rb") as f:
-                return client.audio.transcriptions.create(
-                    file=(filename, f.read()),
-                    model="whisper-large-v3-turbo",
-                    response_format="text",
-                    language=whisper_lang,
-                )
-
-        result = await asyncio.get_event_loop().run_in_executor(None, _call)
-        text = result if isinstance(result, str) else getattr(result, "text", "")
-        return text.strip(), None
-    except Exception as e:
-        print(f"Transcription error: {e}")
-        return "", str(e)
-    finally:
-        if tmp_path and os.path.exists(tmp_path):
-            os.unlink(tmp_path)

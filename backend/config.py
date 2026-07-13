@@ -46,7 +46,10 @@ class Settings(BaseSettings):
     google_api_key: SecretStr | None = None
 
     max_upload_size_mb: int = 25
-    allowed_upload_extensions: list[str] = [".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg"]
+    allowed_upload_extensions: list[str] = [
+        ".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg",
+        ".mp3", ".wav", ".m4a", ".webm", ".ogg", ".flac", ".mp4", ".mpeg", ".mpga",
+    ]
 
     redis_url: str = "redis://localhost:6379/0"
     log_level: str = "INFO"

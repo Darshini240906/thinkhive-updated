@@ -15,7 +15,8 @@ export const verifyOTP = (email, otp) => api.post("/otp/verify", { email, otp })
 export const register = d => api.post("/auth/register", d).then(r => r.data);
 export const login = (email, password, organization_slug) => api.post("/auth/login", { email, password, organization_slug }).then(r => r.data);
 export const getCurrentUser = () => api.get("/auth/me").then(r => r.data);
-export const uploadDocument = (file, classification = "internal") => { const f = new FormData(); f.append("file", file); f.append("classification", classification); return api.post("/upload", f).then(r => r.data); };
+export const uploadDocument = (file, classification = "internal", language = "en") => { const f = new FormData(); f.append("file", file); f.append("classification", classification); f.append("language", language); return api.post("/upload", f).then(r => r.data); };
+export const uploadYoutube = (url, classification = "internal", language = "en") => api.post("/upload/youtube", { url, classification, language }).then(r => r.data);
 export const getDocuments = () => api.get("/documents").then(r => r.data);
 export const getDocumentStatus = id => api.get(`/documents/${id}/status`).then(r => r.data);
 export const deleteDocument = id => api.delete(`/documents/${id}`).then(r => r.data);
@@ -29,6 +30,7 @@ export const getConversationMessages = id => api.get(`/chat/conversations/${id}/
 export const deleteConversation = id => api.delete(`/chat/conversations/${id}`).then(r => r.data);
 export const semanticSearch = (query, limit = 10) => api.post("/search", { query, limit }).then(r => r.data);
 export const generateSummary = topic => api.post("/summary", { topic }).then(r => r.data);
+export const generateReport = data => api.post("/reports", data).then(r => r.data);
 export const getDashboardMetrics = () => api.get("/dashboard/metrics").then(r => r.data);
 export const getKnowledgeMap = () => api.get("/dashboard/knowledge-map").then(r => r.data);
 export const getGapAnalysis = () => api.get("/dashboard/gap-analysis").then(r => r.data);
@@ -57,7 +59,6 @@ api.post("/auth/change-password", { current_password, new_password }).then(r => 
 
 export const activateAccount = d => api.post("/auth/activate", d).then(r => r.data);
 export const resendActivation = d => api.post("/auth/resend-activation", d).then(r => r.data);
-export const generateReport = data => api.post("/reports", data).then(r => r.data);
 
 // Knowledge Analytics Dashboard — super admin only (backend enforces via
 // the "analytics:read" permission, which no other role is ever granted).

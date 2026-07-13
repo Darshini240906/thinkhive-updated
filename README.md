@@ -114,6 +114,8 @@ Frontend runs at: http://localhost:5173
 | Company registration with OTP | ✅ |
 | Login with org slug | ✅ |
 | Document upload (PDF, DOCX, TXT) | ✅ |
+| Audio file upload (MP3, WAV, M4A, OGG, FLAC) | ✅ (needs GROQ_API_KEY) |
+| YouTube link ingestion | ✅ (captions, or audio + Whisper fallback) |
 | OCR for scanned PDFs | ✅ (needs tesseract) |
 | PII sanitisation | ✅ (needs presidio) |
 | Salary detection | ✅ |
@@ -157,7 +159,7 @@ alice@company.com,Alice Brown,guest
 → Slug is case-sensitive and lowercase only
 
 **Upload fails with 415 error**
-→ Only PDF, DOCX, and TXT files are supported
+→ Only PDF, DOCX, TXT, PNG, JPG, and MP3/WAV/M4A/OGG/FLAC/WEBM audio are supported
 
 **OTP not received**
 → In development mode, OTP is printed in the backend terminal
@@ -167,6 +169,12 @@ alice@company.com,Alice Brown,guest
 → Install whisper: pip install openai-whisper
 → Install ffmpeg: brew install ffmpeg (Mac) or download from ffmpeg.org (Windows)
 → Allow microphone access in your browser
+
+**Audio upload or YouTube ingestion fails**
+→ Requires GROQ_API_KEY in .env (same key used for voice query)
+→ YouTube links without captions fall back to downloading + transcribing audio,
+  which requires ffmpeg on the server (brew install ffmpeg / apt install ffmpeg)
+→ Very long recordings may exceed Groq's per-file size limit — trim and re-upload
 
 **Sentence-transformers model download slow**
 → First run downloads ~2.2GB multilingual-e5-large model
