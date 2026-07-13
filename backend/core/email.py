@@ -24,14 +24,11 @@ def _send_sync(to_email: str, subject: str, html_body: str) -> None:
 
 
 async def send_email(to_email: str, subject: str, html_body: str) -> None:
-    await asyncio.to_thread(_send_sync, to_email, subject, html_body)
-
-
-async def send_email(to_email: str, subject: str, html_body: str) -> None:
     try:
         await asyncio.to_thread(_send_sync, to_email, subject, html_body)
     except Exception as e:
         print(f"[EMAIL ERROR] Failed to send to {to_email}: {e}")
+        raise RuntimeError(f"Failed to send email to {to_email}: {e}") from e
 
 
 async def send_activation_email(to_email: str, full_name: str, org_slug: str, otp: str) -> None:

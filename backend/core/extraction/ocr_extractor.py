@@ -7,6 +7,7 @@ async def extract_ocr(content: bytes, is_pdf: bool = True) -> ExtractionResult:
     try:
         import io
         import pytesseract
+        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
         from pdf2image import convert_from_bytes
         from PIL import Image
 

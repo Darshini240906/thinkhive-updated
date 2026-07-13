@@ -17,10 +17,12 @@ export default function UploadPanel() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
+accept: {
       "application/pdf": [".pdf"],
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
       "text/plain": [".txt"],
+      "image/png": [".png"],
+      "image/jpeg": [".jpg", ".jpeg"],
     },
     maxSize: 25 * 1024 * 1024,
   });
@@ -58,7 +60,7 @@ export default function UploadPanel() {
         <input {...getInputProps()} />
         <Upload size={32} className={`mx-auto mb-3 transition-transform ${isDragActive ? "text-gold scale-110" : "text-rose-muted"}`} />
         <p className="text-sm font-medium text-cream">{isDragActive ? "Drop files here" : "Drag & drop files, or click to browse"}</p>
-        <p className="mt-1 text-xs text-rose-muted">PDF, DOCX, TXT · Max 25MB each</p>
+        <p className="mt-1 text-xs text-rose-muted">PDF, DOCX, TXT, PNG, JPG · Max 25MB each</p>
       </div>
 
       <div className="flex items-center gap-3">
