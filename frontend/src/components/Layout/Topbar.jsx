@@ -1,5 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
-import { Search, Bell, Moon, Sun } from "lucide-react";
+import { Bell, Moon, Sun } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -24,16 +24,9 @@ export default function Topbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-rose-muted">
-          <Search size={15} />
-          <span>Search...</span>
-          <kbd className="ml-3 rounded bg-white/5 px-1.5 py-0.5 font-mono text-xs">⌘K</kbd>
-        </div>
+        
 
-        <button className="relative text-rose-muted hover:text-cream transition-colors">
-          <Bell size={18} />
-          <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-danger" />
-        </button>
+
 
         <button
           onClick={toggleTheme}
