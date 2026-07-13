@@ -63,7 +63,8 @@ class LLMService:
         if self._gemini:
             return await self._gemini_gen(system_prompt, user_msg)
         return f"*LLM not configured. Add GROQ_API_KEY or GOOGLE_API_KEY to .env*\n\nRelevant content found:\n\n{context[:600]}"
-        async def generate_report(self, instruction: str, chunks: list[RetrievedChunk], language_code: str = "en") -> str:
+
+    async def generate_report(self, instruction: str, chunks: list[RetrievedChunk], language_code: str = "en") -> str:
         """Generate a structured, source-bound report from retrieved passages."""
         lang = get_language(language_code)
         context = "\n\n---\n\n".join(

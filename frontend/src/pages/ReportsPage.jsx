@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { ClipboardList, Download, FileText, Lightbulb, Loader2, Presentation, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { renderToStaticMarkup } from "react-dom/server";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { generateReport } from "../services/api";
 
 const REPORT_TYPES = [
@@ -10,29 +15,132 @@ const REPORT_TYPES = [
   { id: "research_insights", label: "Research insights", description: "Findings and implications", icon: Lightbulb },
 ];
 
+// On-screen rendering — matches the app's dark theme tokens.
+const SCREEN_MD_COMPONENTS = {
+  h1: p => <h2 className="mb-2 mt-5 font-display text-lg font-bold text-cream first:mt-0" {...p} />,
+  h2: p => <h3 className="mb-2 mt-5 font-display text-base font-bold text-cream first:mt-0" {...p} />,
+  h3: p => <h4 className="mb-1.5 mt-4 text-sm font-semibold text-gold first:mt-0" {...p} />,
+  h4: p => <h5 className="mb-1.5 mt-3 text-sm font-semibold text-cream first:mt-0" {...p} />,
+  p: p => <p className="mb-3 text-sm leading-7 text-rose-muted" {...p} />,
+  ul: p => <ul className="mb-3 list-disc space-y-1 pl-5 text-sm text-rose-muted" {...p} />,
+  ol: p => <ol className="mb-3 list-decimal space-y-1 pl-5 text-sm text-rose-muted" {...p} />,
+  li: p => <li className="leading-6" {...p} />,
+  strong: p => <strong className="font-semibold text-cream" {...p} />,
+  em: p => <em className="italic" {...p} />,
+  a: p => <a className="text-gold underline hover:text-gold-light" target="_blank" rel="noreferrer" {...p} />,
+  blockquote: p => <blockquote className="mb-3 border-l-2 border-gold/40 pl-3 italic text-rose-muted/90" {...p} />,
+  code: p => <code className="rounded bg-base px-1.5 py-0.5 text-xs text-gold" {...p} />,
+  hr: () => <hr className="my-4 border-border" />,
+  table: p => <div className="mb-3 overflow-x-auto"><table className="w-full border-collapse text-sm" {...p} /></div>,
+  th: p => <th className="border border-border px-2 py-1 text-left text-cream" {...p} />,
+  td: p => <td className="border border-border px-2 py-1 text-rose-muted" {...p} />,
+};
+
+// Print rendering — plain inline styles so it reads correctly on a white PDF page,
+// independent of the app's dark theme classes.
+const PDF_MD_COMPONENTS = {
+  h1: p => <h2 style={{ fontSize: "15px", fontWeight: 700, margin: "14px 0 6px", color: "#1a1a1a" }} {...p} />,
+  h2: p => <h3 style={{ fontSize: "13.5px", fontWeight: 700, margin: "12px 0 5px", color: "#1a1a1a" }} {...p} />,
+  h3: p => <h4 style={{ fontSize: "12px", fontWeight: 700, margin: "10px 0 4px", color: "#9a6b12" }} {...p} />,
+  h4: p => <h5 style={{ fontSize: "11.5px", fontWeight: 700, margin: "8px 0 4px", color: "#1a1a1a" }} {...p} />,
+  p: p => <p style={{ margin: "0 0 8px", lineHeight: 1.6, color: "#333333", fontSize: "11px" }} {...p} />,
+  ul: p => <ul style={{ margin: "0 0 8px", paddingLeft: "18px", color: "#333333", fontSize: "11px" }} {...p} />,
+  ol: p => <ol style={{ margin: "0 0 8px", paddingLeft: "18px", color: "#333333", fontSize: "11px" }} {...p} />,
+  li: p => <li style={{ marginBottom: "3px", lineHeight: 1.5 }} {...p} />,
+  strong: p => <strong style={{ fontWeight: 700, color: "#1a1a1a" }} {...p} />,
+  em: p => <em style={{ fontStyle: "italic" }} {...p} />,
+  a: p => <a style={{ color: "#9a6b12" }} {...p} />,
+  blockquote: p => <blockquote style={{ borderLeft: "2px solid #d4af37", paddingLeft: "10px", color: "#555555", fontStyle: "italic", margin: "0 0 8px" }} {...p} />,
+  code: p => <code style={{ background: "#f3f3f3", padding: "1px 4px", borderRadius: "3px", fontSize: "10px" }} {...p} />,
+  hr: () => <hr style={{ border: "none", borderTop: "1px solid #dddddd", margin: "12px 0" }} />,
+  table: p => <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8px", fontSize: "10px" }} {...p} />,
+  th: p => <th style={{ border: "1px solid #dddddd", padding: "4px 6px", textAlign: "left", color: "#1a1a1a" }} {...p} />,
+  td: p => <td style={{ border: "1px solid #dddddd", padding: "4px 6px", color: "#333333" }} {...p} />,
+};
+
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "thinkhive-report";
+}
+
+function escapeHtml(str = "") {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 export default function ReportsPage() {
   const [reportType, setReportType] = useState("executive_summary");
   const [topic, setTopic] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [report, setReport] = useState(null);
 
-  function downloadReport() {
+  async function downloadReport() {
     if (!report) return;
-    const sources = report.sources?.length
-      ? `\n\n## Sources\n\n${report.sources.map(source => `- ${source.document_name}${source.page_number ? ` (page ${source.page_number})` : ""}`).join("\n")}`
+    setDownloading(true);
+
+    const bodyHtml = renderToStaticMarkup(
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={PDF_MD_COMPONENTS}>{report.report}</ReactMarkdown>
+    );
+    const sourcesHtml = report.sources?.length
+      ? `<div style="margin-top:16px;border-top:1px solid #dddddd;padding-top:10px;">
+           <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">Sources</div>
+           <ul style="margin:0;padding-left:18px;">
+             ${report.sources.map(s => `<li style="font-size:10px;color:#555555;margin-bottom:2px;">${escapeHtml(s.document_name)}${s.page_number ? ` (page ${s.page_number})` : ""}</li>`).join("")}
+           </ul>
+         </div>`
       : "";
-    const file = new Blob([
-      `# ${report.title}\n\n_Report type: ${report.report_type_label}_\n\n${report.report}${sources}\n`,
-    ], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${report.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "thinkhive-report"}.md`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+
+    // Rendered at a fixed pixel width, positioned within the viewport (top-left, behind
+    // everything) rather than far off-screen — html2canvas can silently capture a blank
+    // canvas for elements placed at large negative offsets.
+    const width = 794; // ~A4 width at 96dpi
+    const container = document.createElement("div");
+    container.style.cssText = `position:fixed;top:0;left:0;z-index:-1000;width:${width}px;padding:40px;background:#ffffff;font-family:Helvetica,Arial,sans-serif;`;
+    container.innerHTML = `
+      <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#9a6b12;font-weight:700;margin-bottom:4px;">${escapeHtml(report.report_type_label)}</div>
+      <div style="font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:16px;">${escapeHtml(report.title)}</div>
+      ${bodyHtml}
+      ${sourcesHtml}
+    `;
+    document.body.appendChild(container);
+
+    try {
+      // Let the browser paint before capturing.
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        windowWidth: width,
+        width,
+      });
+
+      const pdf = new jsPDF({ unit: "pt", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL("image/png");
+
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${slugify(report.title)}.pdf`);
+    } catch (error) {
+      toast.error("Could not generate the PDF.");
+    } finally {
+      document.body.removeChild(container);
+      setDownloading(false);
+    }
   }
 
   async function submit(event) {
@@ -108,11 +216,14 @@ export default function ReportsPage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold">{report.report_type_label}</p>
                   <h2 className="mt-1 font-display text-2xl font-bold text-cream">{report.title}</h2>
                 </div>
-                <button type="button" onClick={downloadReport} className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-cream transition-colors hover:border-gold/40 hover:text-gold">
-                  <Download size={15} /> Download
+                <button type="button" onClick={downloadReport} disabled={downloading} className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-cream transition-colors hover:border-gold/40 hover:text-gold disabled:cursor-not-allowed disabled:opacity-55">
+                  {downloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+                  {downloading ? "Preparing PDF…" : "Download PDF"}
                 </button>
               </div>
-              <article className="whitespace-pre-wrap break-words py-5 text-sm leading-7 text-rose-muted">{report.report}</article>
+              <div className="py-5">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={SCREEN_MD_COMPONENTS}>{report.report}</ReactMarkdown>
+              </div>
               {report.sources?.length > 0 && <div className="border-t border-border pt-4">
                 <h3 className="text-sm font-semibold text-cream">Sources</h3>
                 <div className="mt-2 flex flex-wrap gap-2">

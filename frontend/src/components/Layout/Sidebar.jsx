@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Brain, LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield, BarChart3 } from "lucide-react";
+import { Brain, LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield, BarChart3,Sparkles } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { hasPermission } from "../../utils/permissions";
 
