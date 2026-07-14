@@ -54,6 +54,17 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     log_level: str = "INFO"
 
+    # Predictive insights / age tagging: a document's age is judged relative
+    # to how long the company has been using ThinkHive, not a fixed day count.
+    # position = doc_age / org_lifetime, both measured from "now".
+    #   <= age_new_threshold      -> new
+    #   <= age_recent_threshold   -> recent
+    #   <= age_old_threshold      -> old
+    #   above that                -> outdated
+    age_new_threshold: float = 0.15
+    age_recent_threshold: float = 0.40
+    age_old_threshold: float = 0.75
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins_value.split(",") if origin.strip()]

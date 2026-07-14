@@ -13,6 +13,7 @@ from core.extraction.ocr_extractor import extract_ocr
 from core.extraction.pdf_extractor import ExtractionResult, extract_pdf
 from core.extraction.txt_extractor import extract_txt
 from core.extraction.youtube_extractor import extract_youtube
+from core.freshness import compute_age_tag
 from core.retrieval import QdrantRetrievalService
 from core.sanitisation.service import SanitisationService
 from documents.models import DocumentRead, UploadResponse
@@ -131,7 +132,8 @@ class DocumentService:
     async def list_documents(self, context: TenantContext) -> list[DocumentRead]:
         full_access = context.role == Role.ORG_SUPER_ADMIN
         docs = await self.repo.list_accessible(context.org_id, context.user_id, context.domain_id, full_access)
-        return [self._to_read(d) for d in docs]
+        org_created_at = await self.repo.get_org_created_at(context.org_id)
+        return [self._to_read(d, org_created_at) for d in docs]
 
     async def delete_document(self, context: TenantContext, doc_id: str) -> bool:
         await self.retrieval.delete_document(context.org_id, doc_id)
@@ -167,7 +169,8 @@ class DocumentService:
         return False
 
     @staticmethod
-    def _to_read(d: dict) -> DocumentRead:
+    def _to_read(d: dict, org_created_at=None) -> DocumentRead:
+        age_tag = compute_age_tag(d.get("created_at"), org_created_at) if d.get("created_at") else AgeTag(d.get("age_tag", "new"))
         return DocumentRead(
             id=str(d["_id"]), org_id=str(d["org_id"]), uploaded_by=str(d["uploaded_by"]),
             filename=d["filename"], content_type=d["content_type"],
@@ -175,7 +178,7 @@ class DocumentService:
             domain_id=d.get("domain_id"),
             status=DocumentStatus(d.get("status", "ready")),
             usage_tag=UsageTag(d.get("usage_tag", "active")),
-            age_tag=AgeTag(d.get("age_tag", "new")),
+            age_tag=age_tag,
             freshness_tag=FreshnessTag(d.get("freshness_tag", "fresh")),
             document_weight=float(d.get("document_weight", 1.0)),
             metadata=d.get("metadata", {}),
