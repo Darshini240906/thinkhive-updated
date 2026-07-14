@@ -1,7 +1,7 @@
 from __future__ import annotations
 from datetime import UTC, datetime
 from config import settings
-from core.enums import AgeTag
+from core.enums import AgeTag, FreshnessTag
 
 
 def _aware(dt: datetime) -> datetime:
@@ -44,3 +44,35 @@ def compute_age_tag(
     if position <= settings.age_old_threshold:
         return AgeTag.OLD
     return AgeTag.OUTDATED
+
+
+_AGE_TO_FRESHNESS = {
+    AgeTag.NEW: FreshnessTag.FRESH,
+    AgeTag.RECENT: FreshnessTag.FRESH,
+    AgeTag.OLD: FreshnessTag.STALE,
+    AgeTag.OUTDATED: FreshnessTag.EXPIRED,
+}
+
+
+def compute_freshness_tag(
+    created_at: datetime,
+    org_created_at: datetime | None,
+    now: datetime | None = None,
+    last_verified: datetime | None = None,
+    stored_tag: str | None = None,
+) -> FreshnessTag:
+    """
+    fresh / stale / expired, computed the same way as age_tag (relative to how
+    long the company has been on ThinkHive) rather than being frozen at "fresh"
+    from the moment of upload.
+
+    - A human manually marking a document "expired" always wins.
+    - If someone manually verified the doc (last_verified set), the freshness
+      clock resets from that date instead of the original upload date.
+    """
+    if stored_tag == "expired":
+        return FreshnessTag.EXPIRED
+
+    reference = last_verified or created_at
+    age_tag = compute_age_tag(reference, org_created_at, now)
+    return _AGE_TO_FRESHNESS[age_tag]

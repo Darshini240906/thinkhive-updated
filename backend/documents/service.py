@@ -13,7 +13,7 @@ from core.extraction.ocr_extractor import extract_ocr
 from core.extraction.pdf_extractor import ExtractionResult, extract_pdf
 from core.extraction.txt_extractor import extract_txt
 from core.extraction.youtube_extractor import extract_youtube
-from core.freshness import compute_age_tag
+from core.freshness import compute_age_tag, compute_freshness_tag
 from core.retrieval import QdrantRetrievalService
 from core.sanitisation.service import SanitisationService
 from documents.models import DocumentRead, UploadResponse
@@ -170,7 +170,16 @@ class DocumentService:
 
     @staticmethod
     def _to_read(d: dict, org_created_at=None) -> DocumentRead:
-        age_tag = compute_age_tag(d.get("created_at"), org_created_at) if d.get("created_at") else AgeTag(d.get("age_tag", "new"))
+        if d.get("created_at"):
+            age_tag = compute_age_tag(d["created_at"], org_created_at)
+            freshness_tag = compute_freshness_tag(
+                d["created_at"], org_created_at,
+                last_verified=d.get("last_verified"),
+                stored_tag=d.get("freshness_tag"),
+            )
+        else:
+            age_tag = AgeTag(d.get("age_tag", "new"))
+            freshness_tag = FreshnessTag(d.get("freshness_tag", "fresh"))
         return DocumentRead(
             id=str(d["_id"]), org_id=str(d["org_id"]), uploaded_by=str(d["uploaded_by"]),
             filename=d["filename"], content_type=d["content_type"],
@@ -179,7 +188,7 @@ class DocumentService:
             status=DocumentStatus(d.get("status", "ready")),
             usage_tag=UsageTag(d.get("usage_tag", "active")),
             age_tag=age_tag,
-            freshness_tag=FreshnessTag(d.get("freshness_tag", "fresh")),
+            freshness_tag=freshness_tag,
             document_weight=float(d.get("document_weight", 1.0)),
             metadata=d.get("metadata", {}),
             created_at=d.get("created_at"), updated_at=d.get("updated_at"),
