@@ -20,6 +20,17 @@ export const uploadYoutube = (url, classification = "internal", language = "en")
 export const getDocuments = () => api.get("/documents").then(r => r.data);
 export const getDocumentStatus = id => api.get(`/documents/${id}/status`).then(r => r.data);
 export const deleteDocument = id => api.delete(`/documents/${id}`).then(r => r.data);
+export const downloadDocument = async (id, filename) => {
+  const response = await api.get(`/documents/${id}/download`, { responseType: "blob" });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename || "document");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
 export const getSanitisationReport = id => api.get(`/document-tags/${id}/sanitisation-report`).then(r => r.data);
 export const updateDocumentTags = (id, d) => api.put(`/document-tags/${id}`, d).then(r => r.data);
 export const sendQuery = (query, language = "en", conversationId = null, limit = 8) =>

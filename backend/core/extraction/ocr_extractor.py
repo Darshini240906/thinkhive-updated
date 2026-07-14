@@ -12,7 +12,7 @@ async def extract_ocr(content: bytes, is_pdf: bool = True) -> ExtractionResult:
         from PIL import Image
 
         if is_pdf:
-            images = convert_from_bytes(content, dpi=300)
+            images = convert_from_bytes(content, dpi=300, poppler_path=r"C:\Users\DARSHINI\Downloads\Release-26.02.0-0\poppler-26.02.0\Library\bin")
         else:
             images = [Image.open(io.BytesIO(content))]
 

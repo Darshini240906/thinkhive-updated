@@ -40,7 +40,7 @@ function Tag({ label }) {
 }
 
 export default function DocumentList() {
-  const { documents, isLoading, fetch, remove } = useDocumentStore();
+  const { documents, isLoading, fetch, remove, download } = useDocumentStore();
   const [view, setView] = useState("grid");
   useEffect(() => { fetch(); }, []);
 
@@ -93,7 +93,9 @@ export default function DocumentList() {
             return (
               <div
                 key={doc.id}
-                className="stagger-item group rounded-2xl border border-border bg-surface p-5 hover:border-gold/30 transition-colors"
+                onClick={() => download(doc)}
+                title="Click to download"
+                className="stagger-item group cursor-pointer rounded-2xl border border-border bg-surface p-5 hover:border-gold/30 transition-colors"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <div className="flex items-start justify-between">
@@ -101,7 +103,7 @@ export default function DocumentList() {
                     <Icon size={20} className={color} />
                   </div>
                   <button
-                    onClick={() => remove(doc.id)}
+                    onClick={(e) => { e.stopPropagation(); remove(doc.id); }}
                     className="rounded-lg p-1.5 text-rose-muted opacity-0 group-hover:opacity-100 hover:bg-danger/10 hover:text-danger transition"
                   >
                     <Trash2 size={14} />
@@ -131,7 +133,9 @@ export default function DocumentList() {
             return (
               <div
                 key={doc.id}
-                className="stagger-item group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 hover:border-gold/30 transition-colors"
+                onClick={() => download(doc)}
+                title="Click to download"
+                className="stagger-item group flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 hover:border-gold/30 transition-colors"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg ${bg}`}>
@@ -152,7 +156,7 @@ export default function DocumentList() {
                   <Zap size={11} /> {Math.round((doc.document_weight || 0) * 100)}%
                 </div>
                 <button
-                  onClick={() => remove(doc.id)}
+                  onClick={(e) => { e.stopPropagation(); remove(doc.id); }}
                   className="flex-shrink-0 rounded-lg p-1.5 text-rose-muted/50 hover:bg-danger/10 hover:text-danger opacity-0 group-hover:opacity-100 transition"
                 >
                   <Trash2 size={14} />

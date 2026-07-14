@@ -17,6 +17,7 @@ from core.retrieval import QdrantRetrievalService
 from core.sanitisation.service import SanitisationService
 from documents.models import DocumentRead, UploadResponse
 from documents.repository import DocumentRepository
+from documents.storage import DocumentStorage
 
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".webm", ".ogg", ".flac", ".mp4", ".mpeg", ".mpga"}
 
@@ -27,6 +28,7 @@ class DocumentService:
         self.embedder = EmbeddingService()
         self.retrieval = QdrantRetrievalService()
         self.sanitiser = SanitisationService()
+        self.storage = DocumentStorage(repository.collection.database)
 
     async def upload(self, context: TenantContext, file: UploadFile, classification: DocumentClassification,
                       language: str = "en") -> UploadResponse:
@@ -57,10 +59,14 @@ class DocumentService:
                 result.metadata.get("error") or "Could not extract any text from this file",
             )
 
+        file_id = await self.storage.save(
+            file.filename or "untitled", content, file.content_type or "application/octet-stream",
+        )
+
         return await self._finalize(
             context, file.filename or "untitled",
             file.content_type or "application/octet-stream",
-            classification, result,
+            classification, result, file_id=file_id,
         )
 
     async def upload_youtube(self, context: TenantContext, url: str, classification: DocumentClassification,
@@ -76,7 +82,8 @@ class DocumentService:
         return await self._finalize(context, f"{title} (YouTube)", "video/youtube", classification, result)
 
     async def _finalize(self, context: TenantContext, filename: str, content_type: str,
-                         classification: DocumentClassification, result: ExtractionResult) -> UploadResponse:
+                         classification: DocumentClassification, result: ExtractionResult,
+                         file_id: str | None = None) -> UploadResponse:
         sanitised_text, sanitisation_log = self.sanitiser.sanitise(result.text)
 
         # Internal docs inherit the uploader's domain. Public/Confidential don't need one.
@@ -88,6 +95,7 @@ class DocumentService:
             "content_type": content_type,
             "classification": classification.value,
             "domain_id": domain_id,
+            "file_id": file_id,
             "status": DocumentStatus.PROCESSING.value,
             "usage_tag": UsageTag.ACTIVE.value,
             "age_tag": AgeTag.NEW.value,
@@ -128,6 +136,35 @@ class DocumentService:
     async def delete_document(self, context: TenantContext, doc_id: str) -> bool:
         await self.retrieval.delete_document(context.org_id, doc_id)
         return await self.repo.update_by_id(context.org_id, doc_id, {"status": "deleted"})
+
+    async def download_document(self, context: TenantContext, doc_id: str) -> tuple[bytes, str, str]:
+        doc = await self.repo.find_by_id(context.org_id, doc_id)
+        if not doc or doc.get("status") == "deleted":
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
+        if not self._can_access(context, doc):
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "You don't have access to this document")
+
+        file_id = doc.get("file_id")
+        content = await self.storage.load(file_id) if file_id else None
+        if content is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                "The original file isn't available for this document (it was uploaded before downloads were supported, or is a YouTube import). Re-upload it to enable downloading.",
+            )
+        return content, doc["filename"], doc.get("content_type", "application/octet-stream")
+
+    @staticmethod
+    def _can_access(context: TenantContext, doc: dict) -> bool:
+        if context.role == Role.ORG_SUPER_ADMIN:
+            return True
+        classification = doc.get("classification")
+        if classification == DocumentClassification.PUBLIC.value:
+            return True
+        if classification == DocumentClassification.CONFIDENTIAL.value:
+            return str(doc.get("uploaded_by")) == context.user_id
+        if classification == DocumentClassification.INTERNAL.value:
+            return bool(context.domain_id) and doc.get("domain_id") == context.domain_id
+        return False
 
     @staticmethod
     def _to_read(d: dict) -> DocumentRead:

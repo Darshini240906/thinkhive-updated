@@ -31,7 +31,7 @@ async def transcribe_audio(content: bytes, filename: str, language: str = "en") 
             tmp_path = tmp.name
 
         from groq import Groq
-        client = Groq(api_key=groq_key)
+        client = Groq(api_key=groq_key, timeout=30.0, max_retries=1)
 
         def _call():
             with open(tmp_path, "rb") as f:
@@ -46,7 +46,9 @@ async def transcribe_audio(content: bytes, filename: str, language: str = "en") 
         text = result if isinstance(result, str) else getattr(result, "text", "")
         return text.strip(), None
     except Exception as e:
-        return "", str(e)
+        import logging
+        logging.getLogger(__name__).exception("Groq transcription failed for %s", filename)
+        return "", f"{type(e).__name__}: {e}"
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)

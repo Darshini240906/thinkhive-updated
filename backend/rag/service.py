@@ -11,7 +11,7 @@ Rules:
 1. Answer ONLY from the provided context passages
 2. Cite sources as [DocumentName, Page X] after each claim
 3. If the answer is not in the context say: "I could not find this in your knowledge base."
-4. Never fabricate information. Be concise and professional.
+4. Never fabricate information. Give complete, thorough answers using all relevant details from the context — don't artificially shorten your response. Be professional and well-organized.
 5. Respond ONLY in {language_name}, regardless of what language the context passages are written in. Translate any cited content into {language_name} as needed."""
 
 
@@ -92,7 +92,7 @@ class LLMService:
             r = await asyncio.get_event_loop().run_in_executor(None, lambda: self._groq.chat.completions.create(
                 model="openai/gpt-oss-120b",
                 messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": msg}],
-                max_tokens=1000, temperature=0.1
+                max_tokens=1800, temperature=0.1
             ))
             return r.choices[0].message.content
         except Exception as e:
