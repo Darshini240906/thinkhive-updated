@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
-import { Brain, ArrowLeft, Linkedin, Github, User } from "lucide-react";
+import { ArrowLeft, Linkedin, Github, User } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
+import logoLight from "../assets/logo-light.png";
+import logoDark from "../assets/logo-dark.png";
 
 // Placeholder team data — replace image, name, role, bio, linkedin, github
 // for each of the 3 members before shipping.
@@ -31,13 +34,15 @@ const TEAM = [
 ];
 
 export default function AboutPage() {
+  const { isDark } = useTheme();
+
   return (
     <div className="min-h-screen bg-base text-cream">
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-border bg-base-deep/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold">
-              <Brain size={16} className="text-base-deep" />
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg">
+              <img src={isDark ? logoDark : logoLight} alt="ThinkHive" className="h-full w-full object-contain" />
             </div>
             <span className="font-display text-lg font-bold text-cream">ThinkHive</span>
           </Link>

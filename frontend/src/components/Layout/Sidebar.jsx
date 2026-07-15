@@ -1,9 +1,12 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Brain, LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield, BarChart3, Sparkles, X } from "lucide-react";
+import { LayoutDashboard, MessageSquare, FileText, Search, Users, Settings, FolderOpen, LogOut, BrainCircuit, Shield, BarChart3, Sparkles, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { hasPermission } from "../../utils/permissions";
 import { useSidebar } from "./SidebarContext";
+import { useTheme } from "../../context/ThemeContext";
+import logoLight from "../../assets/logo-light.png";
+import logoDark from "../../assets/logo-dark.png";
 
 const NAV = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Overview", permission: null },
@@ -20,13 +23,13 @@ const SUPER_ADMIN_NAV = [
   { to: "/analytics", icon: BarChart3, label: "Analytics" },
 ];
 
-function SidebarContent({ expanded, visibleNav, user, logout, navigate, onNavigate, showClose }) {
+function SidebarContent({ expanded, visibleNav, user, logout, navigate, onNavigate, showClose, isDark }) {
   return (
     <>
       <div className="flex items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-6">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gold">
-            <Brain size={18} className="text-base-deep" />
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl">
+            <img src={isDark ? logoDark : logoLight} alt="ThinkHive" className="h-full w-full object-contain" />
           </div>
           {expanded && (
             <span className="font-display text-lg font-bold text-cream whitespace-nowrap animate-fade-in">
@@ -101,6 +104,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { mobileOpen, close } = useSidebar();
+  const { isDark } = useTheme();
   const [expanded, setExpanded] = useState(false);
 
   const visibleNav = user?.role === "org_super_admin"
@@ -132,6 +136,7 @@ export default function Sidebar() {
           user={user}
           logout={logout}
           navigate={navigate}
+          isDark={isDark}
         />
       </aside>
 
@@ -150,6 +155,7 @@ export default function Sidebar() {
               user={user}
               logout={logout}
               navigate={navigate}
+              isDark={isDark}
               onNavigate={close}
               showClose
             />

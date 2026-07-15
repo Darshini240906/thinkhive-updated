@@ -137,7 +137,7 @@ export default function LandingPage() {
               <Link to="/register" className="flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-base-deep transition-colors hover:bg-gold-light sm:px-8 sm:py-4 sm:text-base">
                 Start free trial <ArrowRight size={18} />
               </Link>
-              <Link to="/login" className="rounded-xl border border-border px-6 py-3 text-center text-sm text-cream transition-colors hover:border-gold/40 sm:px-8 sm:py-4 sm:text-base">
+              <Link to="/login" className="rounded-xl border border-border px-6 py-3 text-center text-sm text-cream transition-colors hover:border-gold/40 sm:px-8 sm:py-4 sm:text-base bg-gold">
                 Watch demo
               </Link>
             </div>

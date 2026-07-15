@@ -4,10 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Brain, CheckCircle, Mail } from "lucide-react";
+import { CheckCircle, Mail } from "lucide-react";
 import { register as apiRegister, sendOTP, verifyOTP } from "../../services/api";
 import { storeLoginToken } from "../../services/auth";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useTheme } from "../../context/ThemeContext";
+import logoLight from "../../assets/logo-light.png";
+import logoDark from "../../assets/logo-dark.png";
 
 const STEPS = ["Company Info","Verify Email","Create Account"];
 const s1 = z.object({ organization_name: z.string().min(2), organization_slug: z.string().min(2).regex(/^[a-z0-9-]+$/,"Lowercase, numbers, hyphens only"), email: z.string().email() });
@@ -16,6 +19,7 @@ const s3 = z.object({ full_name: z.string().min(2), password: z.string().min(8),
 export default function Register() {
   const navigate = useNavigate();
   const fetchUser = useAuthStore(s => s.fetchUser);
+  const { isDark } = useTheme();
   const [step, setStep] = useState(0);
   const [otp, setOtp] = useState("");
   const [stepData, setStepData] = useState({});
@@ -110,10 +114,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Brain, CheckCircle, Mail } from "lucide-react";
+import { CheckCircle, Mail } from "lucide-react";
 import { register as apiRegister, sendOTP, verifyOTP } from "../../services/api";
 import { storeLoginToken } from "../../services/auth";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useTheme } from "../../context/ThemeContext";
+import logoLight from "../../assets/logo-light.png";
+import logoDark from "../../assets/logo-dark.png";
 
 const STEPS = ["Company Info", "Verify Email", "Create Account"];
 const s1 = z.object({ organization_name: z.string().min(2), organization_slug: z.string().min(2).regex(/^[a-z0-9-]+$/, "Lowercase, numbers, hyphens only"), email: z.string().email() });
@@ -122,6 +129,7 @@ const s3 = z.object({ full_name: z.string().min(2), password: z.string().min(8),
 export default function Register() {
   const navigate = useNavigate();
   const fetchUser = useAuthStore(s => s.fetchUser);
+  const { isDark } = useTheme();
   const [step, setStep] = useState(0);
   const [otp, setOtp] = useState("");
   const [stepData, setStepData] = useState({});
@@ -154,8 +162,8 @@ export default function Register() {
     <div className="flex min-h-screen items-center justify-center bg-base px-4 py-12">
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gold">
-            <Brain size={24} className="text-base-deep" />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
+            <img src={isDark ? logoDark : logoLight} alt="ThinkHive" className="h-full w-full object-contain" />
           </div>
           <h1 className="font-display text-2xl font-bold text-cream">Think<span className="text-gold">Hive</span></h1>
           <p className="text-rose-muted">Register your company</p>

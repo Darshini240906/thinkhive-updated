@@ -6,6 +6,9 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Brain, Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useTheme } from "../../context/ThemeContext";
+import logoLight from "../../assets/logo-light.png";
+import logoDark from "../../assets/logo-dark.png";
 
 const schema = z.object({ email: z.string().email(), password: z.string().min(8), organization_slug: z.string().min(2) });
 
@@ -14,6 +17,7 @@ const TRUST_POINTS = ["SOC 2 Type II Certified", "GDPR Compliant", "99.9% SLA Up
 export default function Login() {
   const navigate = useNavigate();
   const { login, isLoading } = useAuthStore();
+  const { isDark } = useTheme();
   const [roleTab, setRoleTab] = useState("super_admin");
   const [remember, setRemember] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
@@ -34,8 +38,8 @@ export default function Login() {
         </Link>
 
         <div className="mb-6 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold">
-            <Brain size={18} className="text-base-deep" />
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl">
+            <img src={isDark ? logoDark : logoLight} alt="ThinkHive" className="h-full w-full object-contain" />
           </div>
           <span className="font-display text-lg font-bold text-cream">ThinkHive</span>
         </div>
