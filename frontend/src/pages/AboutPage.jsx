@@ -3,33 +3,34 @@ import { ArrowLeft, Linkedin, Github, User } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import logoLight from "../assets/logo-light.png";
 import logoDark from "../assets/logo-dark.png";
+import dharni from "../assets/dharni.png";
+import darshini from "../assets/darshini.jpeg";
+import sam from "../assets/samyuktha.jpeg";
 
-// Placeholder team data — replace image, name, role, bio, linkedin, github
-// for each of the 3 members before shipping.
 const TEAM = [
   {
-    image: null,
-    name: "Member Name 1",
-    role: "Role / Title",
-    bio: "Short bio goes here — a sentence or two about what this person built or focused on.",
-    linkedin: "https://linkedin.com/in/placeholder-1",
-    github: "https://github.com/placeholder-1",
+    image: dharni,
+    name: "Dharni Patel",
+    role: "",
+    bio: "AI-focused engineering student skilled in building full-stack AI platforms using React, FastAPI, MongoDB, and Qdrant. Developed ThinkHive's RAG pipeline, confidence scoring, and enterprise knowledge dashboards.",
+    linkedin: "https://www.linkedin.com/in/dharni-patel-a52625323/",
+    github: "https://github.com/Dharnipatel21",
   },
   {
-    image: null,
-    name: "Member Name 2",
-    role: "Role / Title",
-    bio: "Short bio goes here — a sentence or two about what this person built or focused on.",
-    linkedin: "https://linkedin.com/in/placeholder-2",
-    github: "https://github.com/placeholder-2",
+    image: darshini,
+    name: "Darshini",
+    role: "",
+    bio: "Third-year CSBS student skilled in Web Development, Data Structures & Algorithms, Artificial Intelligence, and Problem Solving. Passionate about developing scalable software, learning modern technologies, and contributing to innovative projects.",
+    linkedin: "https://www.linkedin.com/in/s-darshini-jeya-shakthi-a5198431b/",
+    github: "https://github.com/Darshini240906",
   },
   {
-    image: null,
-    name: "Member Name 3",
-    role: "Role / Title",
-    bio: "Short bio goes here — a sentence or two about what this person built or focused on.",
-    linkedin: "https://linkedin.com/in/placeholder-3",
-    github: "https://github.com/placeholder-3",
+    image: sam,
+    name: "Samyuktha Lakshmi",
+    role: "",
+    bio: "Building intelligent web applications with AI and full-stack technologies. Passionate about Generative AI, Retrieval-Augmented Generation (RAG), and creating scalable solutions that bridge technology and business.",
+    linkedin: "https://www.linkedin.com/in/samyuktha-lakshmi-14a7a334a/",
+    github: "https://github.com/samyuuuu-afk",
   },
 ];
 
