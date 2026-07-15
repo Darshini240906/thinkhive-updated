@@ -84,7 +84,7 @@ export default function UploadPanel() {
     <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`cursor-pointer rounded-2xl border-2 border-dashed p-10 text-center transition-colors
+        className={`cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition-colors sm:p-10
           ${isDragActive ? "border-gold bg-gold/5" : "border-border hover:border-gold/40 hover:bg-white/[0.02]"}`}
       >
         <input {...getInputProps()} />
@@ -100,13 +100,13 @@ export default function UploadPanel() {
           onChange={e => setYoutubeUrl(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleAddYoutube()}
           placeholder="Paste a YouTube link to add its transcript to your knowledge base…"
-          className="min-w-[220px] flex-1 bg-transparent text-sm text-cream placeholder:text-rose-muted/60 outline-none"
+          className="min-w-0 flex-1 bg-transparent text-sm text-cream placeholder:text-rose-muted/60 outline-none sm:min-w-[220px]"
         />
         <button
           type="button"
           onClick={handleAddYoutube}
           disabled={youtubeBusy || !youtubeUrl.trim()}
-          className="flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-base-deep transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-base-deep transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:py-1.5"
         >
           {youtubeBusy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
           {youtubeBusy ? "Processing…" : "Add"}

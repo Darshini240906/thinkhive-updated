@@ -99,7 +99,7 @@ const SolarSystem = () => {
       if (!entry) return;
       const width = Math.round(entry.contentRect.width);
       if (width <= 0) return; // ignore transient 0-width layout passes
-      const height = Math.max(480, Math.min(640, width * 0.55));
+      const height = Math.max(320, Math.min(640, width < 640 ? width * 0.8 : width * 0.55));
       setCanvasSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
     });
 
@@ -345,11 +345,11 @@ const SolarSystem = () => {
   }
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6 xl:flex-row">
       <div ref={containerRefCallback} className="flex-1 rounded-2xl overflow-hidden" style={panelStyle}>
         {stats && (
           <div
-            className="flex flex-wrap items-center gap-x-6 gap-y-1 px-5 py-3 text-xs"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-xs sm:px-5 sm:gap-x-6"
             style={{ borderBottom: `1px solid ${THEME.panelBorder}`, color: THEME.textSecondary }}
           >
             <span style={{ color: THEME.textPrimary }}>
@@ -371,14 +371,14 @@ const SolarSystem = () => {
           onClick={handleCanvasClick}
           className="w-full cursor-pointer block"
         />
-        <p className="text-xs px-5 py-3" style={{ color: THEME.textSecondary, borderTop: `1px solid ${THEME.panelBorder}` }}>
+        <p className="px-4 py-3 text-xs sm:px-5" style={{ color: THEME.textSecondary, borderTop: `1px solid ${THEME.panelBorder}` }}>
           Click any node to view document details
         </p>
       </div>
 
       {/* Side panel: legend + selected document, rendered as real DOM instead of canvas text for crispness/accessibility */}
-      <div className="w-full xl:w-72 flex flex-col gap-4">
-        <div className="rounded-2xl p-5" style={panelStyle}>
+      <div className="flex w-full flex-col gap-4 xl:w-72">
+        <div className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
           <h3
             className="text-sm font-semibold mb-3"
             style={{ fontFamily: "'Playfair Display', serif", color: THEME.textPrimary }}
@@ -396,7 +396,7 @@ const SolarSystem = () => {
         </div>
 
         {selectedDoc ? (
-          <div className="rounded-2xl p-5" style={panelStyle}>
+          <div className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
             <h3
               className="text-sm font-semibold mb-3"
               style={{ fontFamily: "'Playfair Display', serif", color: THEME.textPrimary }}
@@ -413,7 +413,7 @@ const SolarSystem = () => {
             </dl>
           </div>
         ) : (
-          <div className="rounded-2xl p-5 text-xs" style={{ ...panelStyle, color: THEME.textSecondary }}>
+          <div className="rounded-2xl p-4 text-xs sm:p-5" style={{ ...panelStyle, color: THEME.textSecondary }}>
             Select a document node to see its details here.
           </div>
         )}

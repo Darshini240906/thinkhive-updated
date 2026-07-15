@@ -163,18 +163,18 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-7">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-7">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="mb-2 flex items-center gap-2 text-sm font-medium text-gold"><Sparkles size={16} /> AI reporting</p>
-          <h1 className="font-display text-3xl font-bold text-cream">Reports & summaries</h1>
-          <p className="mt-1 text-rose-muted">Turn knowledge-base documents or meeting notes into grounded, shareable reports.</p>
+          <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">Reports & summaries</h1>
+          <p className="mt-1 text-sm text-rose-muted sm:text-base">Turn knowledge-base documents or meeting notes into grounded, shareable reports.</p>
         </div>
         {report && <span className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-sm text-gold">{report.source_count} source{report.source_count === 1 ? "" : "s"} used</span>}
       </div>
 
       <div className="grid gap-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <form onSubmit={submit} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+        <form onSubmit={submit} className="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5">
           <h2 className="font-display text-xl font-bold text-cream">Create a report</h2>
           <p className="mt-1 text-sm text-rose-muted">Choose an outcome, then provide a topic, notes, or both.</p>
 
@@ -202,21 +202,21 @@ export default function ReportsPage() {
           </button>
         </form>
 
-        <section className="min-h-[480px] rounded-2xl border border-border bg-surface p-5">
+        <section className="min-h-[400px] rounded-2xl border border-border bg-surface p-4 sm:min-h-[480px] sm:p-5">
           {!report ? (
-            <div className="flex h-full min-h-[430px] flex-col items-center justify-center text-center">
+            <div className="flex h-full min-h-[350px] flex-col items-center justify-center text-center sm:min-h-[430px]">
               <div className="rounded-2xl bg-gold/10 p-4 text-gold"><Sparkles size={28} /></div>
               <h2 className="mt-4 font-display text-xl font-bold text-cream">Your generated report will appear here</h2>
               <p className="mt-2 max-w-sm text-sm leading-6 text-rose-muted">Reports are grounded in the source text and knowledge-base documents you provide.</p>
             </div>
           ) : (
             <div>
-              <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
-                <div>
+              <div className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold">{report.report_type_label}</p>
-                  <h2 className="mt-1 font-display text-2xl font-bold text-cream">{report.title}</h2>
+                  <h2 className="mt-1 break-words font-display text-xl font-bold text-cream sm:text-2xl">{report.title}</h2>
                 </div>
-                <button type="button" onClick={downloadReport} disabled={downloading} className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-cream transition-colors hover:border-gold/40 hover:text-gold disabled:cursor-not-allowed disabled:opacity-55">
+                <button type="button" onClick={downloadReport} disabled={downloading} className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-cream transition-colors hover:border-gold/40 hover:text-gold disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto sm:flex-shrink-0">
                   {downloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
                   {downloading ? "Preparing PDF…" : "Download PDF"}
                 </button>

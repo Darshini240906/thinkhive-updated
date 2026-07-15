@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, Trash2, Bot, Globe } from "lucide-react";
+import { Send, Trash2, Bot, Globe, Menu } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import VoiceRecorder from "./VoiceRecorder";
 import { useChatStore } from "../../store/useChatStore";
@@ -7,7 +7,7 @@ import { useLanguageStore, LANGUAGES } from "../../store/useLanguageStore";
 
 const SUGGESTIONS = ["What is the leave policy?", "Summarise vendor contracts", "What are safety protocols?", "Who are our key suppliers?"];
 
-export default function ChatWindow() {
+export default function ChatWindow({ onOpenSidebar }) {
   const { messages, isLoading, send, newChat } = useChatStore();
   const { language, setLanguage } = useLanguageStore();
   const [input, setInput] = useState("");
@@ -20,17 +20,25 @@ export default function ChatWindow() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/15">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onOpenSidebar}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-border text-rose-muted hover:bg-white/5 hover:text-cream transition-colors md:hidden"
+            aria-label="Open conversations"
+          >
+            <Menu size={18} />
+          </button>
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gold/15">
             <Bot size={16} className="text-gold" />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-cream">AI Assistant</p>
-            <p className="text-xs text-rose-muted">RAG-powered · cited answers</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-cream">AI Assistant</p>
+            <p className="hidden text-xs text-rose-muted sm:block">RAG-powered · cited answers</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1.5">
             <Globe size={13} className="text-rose-muted" />
             <select
@@ -49,7 +57,7 @@ export default function ChatWindow() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 sm:px-6">
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center text-center py-16">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gold/15">
@@ -57,7 +65,7 @@ export default function ChatWindow() {
             </div>
             <p className="font-display text-lg font-semibold text-cream">Ask your knowledge base</p>
             <p className="mt-1 text-sm text-rose-muted mb-6">Upload documents first, then ask anything</p>
-            <div className="grid gap-2 sm:grid-cols-2 max-w-lg w-full">
+            <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
               {SUGGESTIONS.map((q, i) => (
                 <button
                   key={q}
@@ -89,7 +97,7 @@ export default function ChatWindow() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-border px-6 py-4">
+      <div className="border-t border-border px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-end gap-3 rounded-2xl border border-border bg-surface px-4 py-3">
           <textarea
             value={input}

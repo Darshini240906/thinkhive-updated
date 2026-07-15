@@ -76,8 +76,8 @@ export default function GapAnalysisList({ onStatsLoaded }) {
         {gaps.map((g) => {
           const s = severityStyle[g.severity] || severityStyle['high-risk'];
           return (
-            <div key={g.id} className="rounded-2xl p-5" style={panelStyle}>
-              <div className="flex items-start justify-between gap-4">
+            <div key={g.id} className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <AlertTriangle size={18} style={{ color: s.badgeText, marginTop: 2, flexShrink: 0 }} />
                   <div className="min-w-0">
@@ -99,7 +99,7 @@ export default function GapAnalysisList({ onStatsLoaded }) {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 text-right w-32">
+                <div className="w-full text-left sm:w-32 sm:flex-shrink-0 sm:text-right">
                   <p className="text-xs mb-1.5" style={{ color: s.badgeText }}>{g.confidence}% confidence</p>
                   <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-hover)' }}>
                     <div className="h-full rounded-full" style={{ width: `${g.confidence}%`, background: s.bar }} />

@@ -39,19 +39,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-cream">Settings</h1>
-        <p className="mt-1 text-rose-muted">Manage your account and preferences</p>
+        <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">Settings</h1>
+        <p className="mt-1 text-sm text-rose-muted sm:text-base">Manage your account and preferences</p>
       </div>
 
       {/* Profile */}
-      <div className="rounded-2xl border border-border bg-surface p-6">
+      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-5">
           <User size={17} className="text-gold" />
           <h2 className="font-display text-base font-semibold text-cream">Profile</h2>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
             <p className="text-xs text-rose-muted mb-1">Full name</p>
             <p className="text-cream">{user?.full_name || "—"}</p>
@@ -74,7 +74,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Appearance */}
-      <div className="rounded-2xl border border-border bg-surface p-6">
+      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-5">
           {isDark ? <Moon size={17} className="text-gold" /> : <Sun size={17} className="text-gold" />}
           <h2 className="font-display text-base font-semibold text-cream">Appearance</h2>
@@ -96,7 +96,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Change password */}
-      <div className="rounded-2xl border border-border bg-surface p-6">
+      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-5">
           <Lock size={17} className="text-gold" />
           <h2 className="font-display text-base font-semibold text-cream">Change Password</h2>

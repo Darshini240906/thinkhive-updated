@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Brain, KeyRound, ArrowLeft, ShieldCheck } from "lucide-react";
+import logoDark from "../assets/logo-dark.png";
+import {KeyRound, ArrowLeft, ShieldCheck } from "lucide-react";
 import { activateAccount, resendActivation } from "../services/api";
 import { storeLoginToken } from "../services/auth";
 import { useAuthStore } from "../store/useAuthStore";
@@ -65,7 +66,7 @@ export default function ActivateAccountPage() {
 
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gold">
-            <Brain size={24} className="text-base-deep" />
+            <img src={logoDark} alt="ThinkHive" className="h-6 w-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-cream">
             Think<span className="text-gold">Hive</span>

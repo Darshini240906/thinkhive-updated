@@ -30,7 +30,7 @@ function MetricCard({ icon: Icon, label, value, i = 0, suffix = "" }) {
           <Icon size={17} className="text-gold" />
         </div>
       </div>
-      <p className="mt-3 font-display text-3xl font-bold text-cream">
+      <p className="mt-3 font-display text-2xl font-bold text-cream sm:text-3xl">
         {value == null ? "—" : numeric ? <AnimatedCounter value={value} suffix={suffix} /> : value}
       </p>
       <p className="mt-1 text-sm text-rose-muted">{label}</p>
@@ -40,7 +40,7 @@ function MetricCard({ icon: Icon, label, value, i = 0, suffix = "" }) {
 
 function Panel({ title, icon: Icon, children, action }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-6">
+    <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           {Icon && <Icon size={16} className="text-gold" />}
@@ -103,15 +103,15 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-cream">Knowledge Analytics</h1>
-          <p className="mt-1 text-rose-muted">
+          <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">Knowledge Analytics</h1>
+          <p className="mt-1 text-sm text-rose-muted sm:text-base">
             Org-wide query, usage, and knowledge-health trends · visible to super admins only
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex gap-1 rounded-xl border border-border bg-surface p-1">
             {[7, 14, 30].map((d) => (
               <button
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Overview metrics */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard i={0} icon={MessageSquare} label="Total Queries" value={overview?.total_queries} />
         <MetricCard i={1} icon={Activity} label="Queries This Week" value={overview?.queries_this_week} />
         <MetricCard i={2} icon={TrendingUp} label="Avg Confidence" value={overview?.avg_confidence != null ? Math.round(overview.avg_confidence * 100) : null} suffix="%" />
@@ -189,7 +189,7 @@ export default function AnalyticsPage() {
         )}
       </Panel>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Most searched topics */}
         <Panel title="Most Searched Topics" icon={Search}>
           {topics.length === 0 ? (
@@ -244,8 +244,31 @@ export default function AnalyticsPage() {
         {userActivity.length === 0 ? (
           <p className="text-sm text-rose-muted py-6 text-center">No user activity recorded yet</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <>
+            <div className="space-y-3 sm:hidden">
+              {userActivity.map((u, i) => (
+                <div key={u.user_id || i} className="rounded-xl border border-border bg-base p-4">
+                  <p className="font-medium text-cream">{u.full_name}</p>
+                  <p className="text-xs text-rose-muted">{u.email}</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-xs text-rose-muted">Role</p>
+                      <p className="capitalize text-cream">{(u.role || "").replace(/_/g, " ")}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-rose-muted">Queries</p>
+                      <p className="font-medium text-cream">{u.query_count}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-xs text-rose-muted">Last active</p>
+                      <p className="text-cream">{u.last_active ? new Date(u.last_active).toLocaleDateString() : "—"}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-2 pr-4 font-semibold text-rose-muted">User</th>
@@ -270,7 +293,8 @@ export default function AnalyticsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </Panel>
     </div>

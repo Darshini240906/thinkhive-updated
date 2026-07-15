@@ -104,7 +104,7 @@ function MetricCard({ icon: Icon, label, value, delta, i }) {
         </div>
         {delta && <span className="text-xs text-success">{delta}</span>}
       </div>
-      <p className="mt-3 font-display text-3xl font-bold text-cream">
+      <p className="mt-3 font-display text-2xl font-bold text-cream sm:text-3xl">
         {value == null ? "—" : numeric ? <AnimatedCounter value={value} /> : value}
       </p>
       <p className="mt-1 text-sm text-rose-muted">{label}</p>
@@ -131,10 +131,10 @@ export default function DashboardPage() {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-cream">
+          <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">
             Good {getGreeting()}, {user?.full_name?.split(" ")[0] || "there"}
           </h1>
           <p className="mt-1 text-rose-muted">{today} · Everything looks healthy</p>
@@ -148,7 +148,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard i={0} icon={Users} label="Total Members" value={metrics?.total_members} />
         <MetricCard i={1} icon={FolderOpen} label="Active Domains" value={metrics?.total_domains} />
         <MetricCard i={2} icon={FileText} label="Documents" value={metrics?.total_documents} />
@@ -161,9 +161,9 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Knowledge Gaps — your real data, styled as the "Recent Activity" panel */}
-        <div className="rounded-2xl border border-border bg-surface p-6">
+        <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-semibold text-cream">Knowledge Gaps</h2>
           </div>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Predictive Insights — styled as the "Quick Actions" panel */}
-        <div className="rounded-2xl border border-border bg-surface p-6">
+        <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-semibold text-cream">Predictive Insights</h2>
             <Sparkles size={16} className="text-gold" />

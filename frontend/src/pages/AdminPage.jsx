@@ -85,7 +85,7 @@ export default function AdminPage() {
   );
 }
 */
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Users, RefreshCw, Trash2, Edit, Loader2, ShieldCheck, Info } from "lucide-react";
 import { getAuditTrail, getUsers, deleteUser, getPermissionsMatrix } from "../services/api";
 import EditPermissionsModal from "../components/Admin/EditPermissionsModal";
@@ -150,13 +150,13 @@ export default function AdminPage() {
   ).sort();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold font-display" style={{ color: "var(--color-cream)" }}>
+          <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">
             Admin Settings
           </h1>
-          <p className="mt-1" style={{ color: "var(--color-rose-muted)" }}>
+          <p className="mt-1 text-sm text-rose-muted sm:text-base">
             Manage users, roles, and permissions
           </p>
         </div>
@@ -170,7 +170,7 @@ export default function AdminPage() {
       </div>
 
       {/* Stat cards — real role counts from the actual user list */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {["org_super_admin", "manager", "employee", "guest"].map((role) => (
           <div key={role} className="rounded-2xl p-5" style={panelStyle}>
             <div
@@ -190,7 +190,7 @@ export default function AdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-xl p-1 w-fit" style={panelStyle}>
+      <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl p-1" style={panelStyle}>
         {[
           { k: "users", label: `Users (${users.length})` },
           { k: "matrix", label: "Permissions Matrix" },
@@ -199,7 +199,7 @@ export default function AdminPage() {
           <button
             key={k}
             onClick={() => setTab(k)}
-            className="rounded-lg px-4 py-2 text-sm font-medium transition"
+            className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition sm:px-4"
             style={
               tab === k
                 ? { background: "#c9974a", color: "#2B0A0F" }
@@ -212,7 +212,7 @@ export default function AdminPage() {
       </div>
 
       {tab === "users" && (
-        <div className="rounded-2xl p-5" style={panelStyle}>
+        <div className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
           {loading ? (
             <div className="flex items-center justify-center py-8" style={{ color: "var(--color-rose-muted)" }}>
               <Loader2 size={18} className="animate-spin mr-2" />Loading...
@@ -222,11 +222,45 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-2">
               {users.map((u) => (
-                <div
-                  key={u.id}
-                  className="flex items-center gap-3 rounded-xl px-4 py-3"
-                  style={{ background: "var(--color-surface-hover)", border: "1px solid var(--color-border)" }}
-                >
+                <Fragment key={u.id}>
+                  <div
+                    className="rounded-xl px-3 py-3 sm:hidden"
+                    style={{ background: "var(--color-surface-hover)", border: "1px solid var(--color-border)" }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-full flex-shrink-0"
+                        style={{ background: "rgba(201, 151, 71, 0.18)" }}
+                      >
+                        <span className="text-sm font-semibold text-gold">
+                          {(u.full_name || "?")[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate text-cream">{u.full_name}</p>
+                        <p className="text-xs truncate text-rose-muted">{u.email}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <span className="text-xs text-rose-muted">{ROLE_LABELS[u.role] || u.role}</span>
+                          <span className={`text-xs rounded-full px-2 py-0.5 ${u.is_active ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}>
+                            {u.is_active ? "Active" : "Disabled"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex justify-end gap-1">
+                      <button onClick={() => setEditingUser(u)} className="rounded-lg p-2 text-rose-muted hover:opacity-80" title="Edit permissions">
+                        <Edit size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(u.id)} className="rounded-lg p-2 text-rose-muted hover:text-danger" title="Delete user">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    key={u.id}
+                    className="hidden sm:flex items-center gap-3 rounded-xl px-4 py-3"
+                    style={{ background: "var(--color-surface-hover)", border: "1px solid var(--color-border)" }}
+                  >
                   <div
                     className="flex h-9 w-9 items-center justify-center rounded-full flex-shrink-0"
                     style={{ background: "rgba(201, 151, 71, 0.18)" }}
@@ -268,7 +302,8 @@ export default function AdminPage() {
                   >
                     <Trash2 size={14} />
                   </button>
-                </div>
+                  </div>
+                  </Fragment>
               ))}
             </div>
           )}
@@ -276,7 +311,7 @@ export default function AdminPage() {
       )}
 
       {tab === "matrix" && (
-        <div className="rounded-2xl p-5" style={panelStyle}>
+        <div className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
           <div
             className="flex items-start gap-2 text-xs rounded-lg px-3 py-2 mb-4"
             style={{ background: "var(--color-surface-hover)", color: "var(--color-rose-muted)" }}
@@ -294,7 +329,7 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="min-w-[640px] w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <th className="text-left py-2 pr-4 font-semibold" style={{ color: "var(--color-rose-muted)" }}>
@@ -332,7 +367,7 @@ export default function AdminPage() {
       )}
 
       {tab === "audit" && (
-        <div className="rounded-2xl p-5" style={panelStyle}>
+        <div className="rounded-2xl p-4 sm:p-5" style={panelStyle}>
           {loading ? (
             <div className="flex items-center justify-center py-8" style={{ color: "var(--color-rose-muted)" }}>
               <Loader2 size={18} className="animate-spin mr-2" />Loading...

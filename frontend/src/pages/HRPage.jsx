@@ -37,22 +37,22 @@ export default function HRPage() {
   useEffect(() => { load(); }, []);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-cream">HR · People</h1>
-          <p className="mt-1 text-rose-muted">{members.length} member{members.length !== 1 ? "s" : ""} · Manage team members, roles, and bulk onboarding</p>
+          <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">HR · People</h1>
+          <p className="mt-1 text-sm text-rose-muted sm:text-base">{members.length} member{members.length !== 1 ? "s" : ""} · Manage team members, roles, and bulk onboarding</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-semibold text-base-deep hover:bg-gold-light transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-semibold text-base-deep hover:bg-gold-light transition-colors sm:w-auto"
         >
           <UserPlus size={16} /> Add Member
         </button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-2xl border border-border bg-surface p-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 lg:col-span-2">
           <h2 className="font-display text-base font-semibold text-cream mb-4 flex items-center gap-2">
             <Users size={17} className="text-gold" /> Team Members
           </h2>
@@ -63,7 +63,7 @@ export default function HRPage() {
           ) : members.length === 0 ? (
             <p className="text-sm text-rose-muted py-6 text-center">No members yet. Add your first team member.</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {members.map((m, i) => (
                 <div
                   key={m.id}
@@ -86,7 +86,7 @@ export default function HRPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface p-5">
+        <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5">
           <h2 className="font-display text-base font-semibold text-cream mb-4">Bulk Upload</h2>
           <BulkUploadCSV onSuccess={load} />
         </div>

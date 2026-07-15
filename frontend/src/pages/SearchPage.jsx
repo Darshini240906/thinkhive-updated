@@ -87,14 +87,14 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-cream">Search</h1>
-        <p className="mt-1 text-rose-muted">Search across people, documents, domains, and activity.</p>
+        <h1 className="font-display text-2xl font-bold text-cream sm:text-3xl">Search</h1>
+        <p className="mt-1 text-sm text-rose-muted sm:text-base">Search across people, documents, domains, and activity.</p>
       </div>
 
-      <div className="flex gap-3">
-        <div className="flex-1 flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 focus-within:border-gold/40 transition-colors">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-1 items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 focus-within:border-gold/40 transition-colors">
           <Search size={18} className="text-rose-muted flex-shrink-0" />
           <input
             value={query}
@@ -109,7 +109,7 @@ export default function SearchPage() {
         <button
           onClick={() => handleSearch()}
           disabled={loading || !query.trim()}
-          className="rounded-xl bg-gold px-6 text-sm font-semibold text-base-deep hover:bg-gold-light disabled:opacity-40 transition-colors"
+          className="w-full rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-base-deep hover:bg-gold-light disabled:opacity-40 transition-colors sm:w-auto sm:py-2"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : "Search"}
         </button>
